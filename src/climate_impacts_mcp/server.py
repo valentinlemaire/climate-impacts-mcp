@@ -32,9 +32,10 @@ INSTRUCTIONS = (
     "3. list_scenarios — get scenario IDs\n\n"
     "Then use get_climate_projections, compare_scenarios, "
     "get_warming_level_snapshot, or get_spatial_data to retrieve data.\n\n"
-    "For maps: use `get_spatial_data` which returns full per-cell grid data with "
-    "country boundary (TopoJSON). When rendering, ALWAYS clip grid cells to the "
-    "country boundary so only the area inside the country is visible.\n\n"
+    "For maps: call `get_spatial_data` — the response already includes the country's "
+    "TopoJSON border in the `boundary` field. ALWAYS use this `boundary` as a clip path "
+    "so grid cells are cropped to the country outline. Never fetch country borders from "
+    "an external URL — the border is already in the response.\n\n"
     "Do NOT guess variable IDs — they are specific (e.g. 'tasAdjust' not 'tas'). "
     "If you use a wrong ID, the tool will suggest valid options."
 )
@@ -82,7 +83,7 @@ def main():
     port = int(os.environ.get("PORT", "0"))
     if port:
         server = _create_server(host="0.0.0.0", port=port)
-        server.run(transport="sse")
+        server.run(transport="streamable-http")
     else:
         server = _create_server()
         server.run()

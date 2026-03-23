@@ -39,10 +39,10 @@ async def get_spatial_data(
     boundary (TopoJSON from world-atlas) for map rendering. Output includes a JSON block
     that can be used directly for D3/SVG visualizations.
 
-    RENDERING INSTRUCTIONS: When rendering a map from this data, you MUST clip the grid
-    cells to the country boundary so that only the area within the country is visible.
-    Each grid cell is a 0.5deg x 0.5deg rectangle. Use the TopoJSON boundary as a clip
-    path (D3: clipPath + topojson.feature) so cells don't bleed outside the country outline.
+    RENDERING INSTRUCTIONS: The response includes a `boundary` field with the country's
+    TopoJSON border. You MUST use it as a clip path — do NOT fetch country borders from
+    any external URL. Each grid cell is a 0.5deg x 0.5deg rectangle. Clip all grid cells
+    to the `boundary` outline (D3: clipPath + topojson.feature) before rendering.
 
     Args:
         country_iso: ISO 3166-1 alpha-3 country code. Use lookup_country to find codes.

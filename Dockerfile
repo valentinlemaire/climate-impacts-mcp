@@ -3,12 +3,11 @@ FROM python:3.11-slim AS builder
 RUN pip install --no-cache-dir poetry==2.1.1
 
 WORKDIR /app
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject.toml poetry.lock* README.md ./
+COPY src/ src/
 
 RUN poetry config virtualenvs.create false \
     && poetry install --only main --no-interaction --no-ansi
-
-COPY src/ src/
 
 FROM python:3.11-slim
 

@@ -189,17 +189,21 @@ def format_spatial_data(
     if geo.warming_levels:
         payload["warming_level"] = geo.warming_levels
 
+    lines.append(
+        "**IMPORTANT — Map rendering requirements:**\n"
+        "- The `boundary` field below contains the country's TopoJSON border. "
+        "You MUST use it as a clip path so grid cells are cropped to the country outline.\n"
+        "- Do NOT fetch country borders from any external URL — the border is already in `boundary`.\n"
+        "- Each grid cell is a 0.5° × 0.5° rectangle centered on [lat, lon].\n"
+        "- D3 pattern: define a `<clipPath>` from `topojson.feature(boundary, ...)`, "
+        "apply it to the grid layer, then draw the boundary stroke on top."
+    )
+    lines.append("")
     lines.append("```json")
     lines.append(json.dumps(payload, separators=(",", ":")))
     lines.append("```")
     lines.append("")
     lines.append(f"_{DATA_SOURCE}_")
-    lines.append("")
-    lines.append(
-        "**Rendering**: Each grid cell is a 0.5° × 0.5° rectangle. "
-        "Use the `boundary` TopoJSON as a clip path so grid cells are clipped "
-        "to the country outline. Draw the boundary stroke on top for a clean border."
-    )
     return "\n".join(lines)
 
 

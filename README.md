@@ -32,7 +32,28 @@ This MCP server is a translation layer — it does not store or modify the under
 
 ## Quick Start
 
-### Local (Claude Desktop)
+### Option 1: Use the hosted server (no install required)
+
+Available on **[Smithery](https://climate-impacts--valentinlemaire.run.tools)** — install with one click directly from the Smithery UI.
+
+Alternatively, add it manually to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "climate-impacts": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://climate-impacts-mcp.vlemaire.com/mcp"]
+    }
+  }
+}
+```
+
+Restart Claude Desktop. The climate tools will appear automatically. No API keys or accounts needed.
+
+> `mcp-remote` is a small bridge that connects Claude Desktop to remote MCP servers. It is installed automatically by `npx` on first run (requires Node.js).
+
+### Option 2: Run locally
 
 1. Install dependencies:
    ```bash
@@ -54,13 +75,14 @@ This MCP server is a translation layer — it does not store or modify the under
 
 3. Restart Claude Desktop. The climate tools will appear automatically.
 
-### Remote (SSE transport)
+### Option 3: Self-host (Streamable HTTP transport)
 
 ```bash
 PORT=8080 poetry run climate-impacts-mcp
 ```
 
-The server runs in SSE mode when `PORT` is set, suitable for Cloud Run or any remote deployment.
+The server runs in Streamable HTTP mode when `PORT` is set, suitable for Cloud Run or any remote deployment.
+The default remote MCP endpoint is `/mcp`.
 
 ## Architecture
 
@@ -91,14 +113,29 @@ On startup, the server pre-fetches and caches:
 gcloud builds submit --config cloudbuild.yaml
 ```
 
+If you want the service to be publicly invokable, run this once after deployment:
+
+```bash
+gcloud run services update climate-impacts-mcp \
+  --region us-central1 \
+  --no-invoker-iam-check
+```
+
 ### Manual deploy
 
 ```bash
 gcloud run deploy climate-impacts-mcp \
   --source . \
   --region us-central1 \
-  --allow-unauthenticated \
   --port 8080
+```
+
+To make the deployed service public:
+
+```bash
+gcloud run services update climate-impacts-mcp \
+  --region us-central1 \
+  --no-invoker-iam-check
 ```
 
 ### Docker
