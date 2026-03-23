@@ -1,0 +1,92 @@
+"""FastMCP server entry point with lifespan management."""
+
+from __future__ import annotations
+
+import os
+from contextlib import asynccontextmanager
+
+import httpx
+from mcp.server.fastmcp import FastMCP
+
+from .client import CIEClient
+from .tools.geodata import get_spatial_data
+from .tools.metadata import list_climate_variables, list_scenarios, lookup_country
+from .tools.overview import get_country_overview
+from .tools.timeseries import (
+    compare_scenarios,
+    get_climate_projections,
+    get_warming_level_snapshot,
+)
+
+INSTRUCTIONS = (
+    "This server provides tools to explore climate change impacts by country, "
+    "emission scenario, and time horizon. Data comes from the Climate Impact Explorer "
+    "(CIE) by Climate Analytics, based on climate impact models developed by IIASA. "
+    "Always cite 'Climate Impact Explorer (Climate Analytics / IIASA)' when presenting data.\n\n"
+    "RECOMMENDED: For a broad overview, start with `get_country_overview` — it accepts a "
+    "country name (e.g. 'Costa Rica') and returns a multi-variable climate impact summary "
+    "comparing current policies vs 1.5C-compatible pathways in one call.\n\n"
+    "For more detailed or specific analysis, use the discovery + projection tools:\n"
+    "1. lookup_country — find ISO codes (e.g. 'DEU', not 'Germany')\n"
+    "2. list_climate_variables — get variable IDs (e.g. 'tasAdjust', NOT 'tas')\n"
+    "3. list_scenarios — get scenario IDs\n\n"
+    "Then use get_climate_projections, compare_scenarios, "
+    "get_warming_level_snapshot, or get_spatial_data to retrieve data.\n\n"
+    "For maps: use `get_spatial_data` which returns full per-cell grid data with "
+    "country boundary (TopoJSON). When rendering, ALWAYS clip grid cells to the "
+    "country boundary so only the area inside the country is visible.\n\n"
+    "Do NOT guess variable IDs — they are specific (e.g. 'tasAdjust' not 'tas'). "
+    "If you use a wrong ID, the tool will suggest valid options."
+)
+
+
+WORLD_ATLAS_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"
+
+
+@asynccontextmanager
+async def lifespan(server: FastMCP):
+    async with httpx.AsyncClient(timeout=30.0) as http:
+        client = CIEClient(http)
+        metadata = await client.get_metadata()
+        # Fetch world-atlas TopoJSON for country boundaries (used by get_spatial_data)
+        world_atlas = None
+        try:
+            atlas_resp = await http.get(WORLD_ATLAS_URL)
+            atlas_resp.raise_for_status()
+            world_atlas = atlas_resp.json()
+        except Exception:
+            pass  # Boundary data will be unavailable but server still works
+        yield {"client": client, "metadata": metadata, "world_atlas": world_atlas}
+
+
+def _create_server(host: str = "127.0.0.1", port: int = 8000) -> FastMCP:
+    server = FastMCP(
+        "Climate Impacts",
+        instructions=INSTRUCTIONS,
+        lifespan=lifespan,
+        host=host,
+        port=port,
+    )
+    server.tool()(get_country_overview)
+    server.tool()(lookup_country)
+    server.tool()(list_climate_variables)
+    server.tool()(list_scenarios)
+    server.tool()(get_climate_projections)
+    server.tool()(compare_scenarios)
+    server.tool()(get_warming_level_snapshot)
+    server.tool()(get_spatial_data)
+    return server
+
+
+def main():
+    port = int(os.environ.get("PORT", "0"))
+    if port:
+        server = _create_server(host="0.0.0.0", port=port)
+        server.run(transport="sse")
+    else:
+        server = _create_server()
+        server.run()
+
+
+if __name__ == "__main__":
+    main()
