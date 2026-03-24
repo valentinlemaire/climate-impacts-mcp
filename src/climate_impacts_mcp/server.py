@@ -6,9 +6,10 @@ import os
 from contextlib import asynccontextmanager
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import Context, FastMCP
 
 from .client import CIEClient
+from .formatting import format_country_list, format_scenario_list, format_variable_list
 from .tools.geodata import get_spatial_data
 from .tools.metadata import list_climate_variables, list_scenarios, lookup_country
 from .tools.overview import get_country_overview
@@ -26,12 +27,15 @@ INSTRUCTIONS = (
     "RECOMMENDED: For a broad overview, start with `get_country_overview` — it accepts a "
     "country name (e.g. 'Costa Rica') and returns a multi-variable climate impact summary "
     "comparing current policies vs 1.5C-compatible pathways in one call.\n\n"
-    "For more detailed or specific analysis, use the discovery + projection tools:\n"
-    "1. lookup_country — find ISO codes (e.g. 'DEU', not 'Germany')\n"
-    "2. list_climate_variables — get variable IDs (e.g. 'tasAdjust', NOT 'tas')\n"
-    "3. list_scenarios — get scenario IDs\n\n"
+    "For more detailed or specific analysis, read the MCP resources first to get valid IDs "
+    "without extra tool calls:\n"
+    "- climate://variables — all variable IDs (e.g. 'tasAdjust', 'prAdjust')\n"
+    "- climate://scenarios — all scenario IDs (e.g. 'h_cpol', 'o_1p5c')\n"
+    "- climate://countries — all country ISO codes (e.g. 'DEU', 'CRI')\n\n"
     "Then use get_climate_projections, compare_scenarios, "
-    "get_warming_level_snapshot, or get_spatial_data to retrieve data.\n\n"
+    "get_warming_level_snapshot, or get_spatial_data to retrieve data. "
+    "The discovery tools (lookup_country, list_climate_variables, list_scenarios) "
+    "remain available as fallbacks for fuzzy search.\n\n"
     "For maps: call `get_spatial_data` — the response already includes the country's "
     "TopoJSON border in the `boundary` field. ALWAYS use this `boundary` as a clip path "
     "so grid cells are cropped to the country outline. Never fetch country borders from "
@@ -60,6 +64,21 @@ async def lifespan(server: FastMCP):
         yield {"client": client, "metadata": metadata, "world_atlas": world_atlas}
 
 
+async def _variables_resource(ctx: Context) -> str:
+    meta = ctx.request_context.lifespan_context["metadata"]
+    return format_variable_list(meta.vars)
+
+
+async def _scenarios_resource(ctx: Context) -> str:
+    meta = ctx.request_context.lifespan_context["metadata"]
+    return format_scenario_list(meta.scenarios)
+
+
+async def _countries_resource(ctx: Context) -> str:
+    meta = ctx.request_context.lifespan_context["metadata"]
+    return format_country_list(meta.countries)
+
+
 def _create_server(host: str = "127.0.0.1", port: int = 8000) -> FastMCP:
     server = FastMCP(
         "Climate Impacts",
@@ -68,6 +87,9 @@ def _create_server(host: str = "127.0.0.1", port: int = 8000) -> FastMCP:
         host=host,
         port=port,
     )
+    server.resource("climate://variables", description="All valid climate variable IDs, names, units, and groups")(_variables_resource)
+    server.resource("climate://scenarios", description="All valid emission scenario IDs and descriptions")(_scenarios_resource)
+    server.resource("climate://countries", description="All supported country names and ISO 3166-1 alpha-3 codes")(_countries_resource)
     server.tool()(get_country_overview)
     server.tool()(lookup_country)
     server.tool()(list_climate_variables)

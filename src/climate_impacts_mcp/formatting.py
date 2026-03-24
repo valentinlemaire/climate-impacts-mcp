@@ -330,6 +330,18 @@ def format_variable_list(variables: list[Variable]) -> str:
     return "\n".join(lines)
 
 
+def format_scenario_list(scenarios) -> str:
+    if not scenarios:
+        return "No scenarios found."
+    lines: list[str] = []
+    lines.append("| ID | Name | Primary | Description |")
+    lines.append("|----|------|---------|-------------|")
+    for s in scenarios:
+        primary = "yes" if getattr(s, "primary", False) else ""
+        lines.append(f"| `{s.id}` | {s.name} | {primary} | {s.description or ''} |")
+    return "\n".join(lines)
+
+
 # --- helpers ---
 
 

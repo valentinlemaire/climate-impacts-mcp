@@ -45,10 +45,10 @@ async def get_spatial_data(
     to the `boundary` outline (D3: clipPath + topojson.feature) before rendering.
 
     Args:
-        country_iso: ISO 3166-1 alpha-3 country code. Use lookup_country to find codes.
-        variable: Climate variable ID (e.g. 'tasAdjust', 'prAdjust'). Use list_climate_variables to get exact IDs — do NOT guess.
+        country_iso: ISO 3166-1 alpha-3 country code. See climate://countries resource for all valid codes.
+        variable: Climate variable ID (e.g. 'tasAdjust', 'prAdjust'). See climate://variables resource for all valid IDs — do NOT guess.
         warming_level: Global warming level in degrees C (1.5, 2.0, 2.5, or 3.0).
-        scenario: Emission scenario ID. Default: 'h_cpol'. Use list_scenarios to see options.
+        scenario: Emission scenario ID. Default: 'h_cpol'. See climate://scenarios resource for all valid IDs.
         season: Season. Default: 'annual'.
     """
     meta = _get_metadata(ctx)

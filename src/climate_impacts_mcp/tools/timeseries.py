@@ -46,9 +46,9 @@ async def get_climate_projections(
     Returns a timeseries from 2015 to 2100 with median, uncertainty range, and warming levels.
 
     Args:
-        country_iso: ISO 3166-1 alpha-3 country code (e.g. 'DEU', 'USA'). Use lookup_country to find codes.
-        variable: Climate variable ID (e.g. 'tasAdjust', 'prAdjust'). Use list_climate_variables to get exact IDs — do NOT guess.
-        scenario: Emission scenario ID (e.g. 'h_cpol'). Use list_scenarios to see options.
+        country_iso: ISO 3166-1 alpha-3 country code (e.g. 'DEU', 'USA'). See climate://countries resource for all valid codes.
+        variable: Climate variable ID (e.g. 'tasAdjust', 'prAdjust'). See climate://variables resource for all valid IDs — do NOT guess.
+        scenario: Emission scenario ID (e.g. 'h_cpol'). See climate://scenarios resource for all valid IDs.
         season: Season — one of 'annual', 'MAM', 'JJA', 'SON', 'DJF'. Default: 'annual'.
         spatial_weighting: Spatial aggregation — one of 'area', 'pop', 'gdp', 'harvarea', 'wheat', 'maize', 'soybean', 'rice', 'sum'. Default: 'area'.
     """
@@ -102,9 +102,9 @@ async def compare_scenarios(
     Fetches data for each scenario in parallel and displays a comparison table at key time horizons.
 
     Args:
-        country_iso: ISO 3166-1 alpha-3 country code. Use lookup_country to find codes.
-        variable: Climate variable ID (e.g. 'tasAdjust', 'prAdjust'). Use list_climate_variables to get exact IDs — do NOT guess.
-        scenarios: List of scenario IDs to compare (e.g. ['o_1p5c', 'h_cpol', 'h_ndc']). Use list_scenarios to see options.
+        country_iso: ISO 3166-1 alpha-3 country code. See climate://countries resource for all valid codes.
+        variable: Climate variable ID (e.g. 'tasAdjust', 'prAdjust'). See climate://variables resource for all valid IDs — do NOT guess.
+        scenarios: List of scenario IDs to compare (e.g. ['o_1p5c', 'h_cpol', 'h_ndc']). See climate://scenarios resource for all valid IDs.
         season: Season — one of 'annual', 'MAM', 'JJA', 'SON', 'DJF'. Default: 'annual'.
         spatial_weighting: Spatial aggregation method. Default: 'area'.
         time_horizons: Years to show in comparison. Default: [2030, 2050, 2100].
@@ -166,9 +166,9 @@ async def get_warming_level_snapshot(
     Shows what impact values correspond to each warming level rather than by year.
 
     Args:
-        country_iso: ISO 3166-1 alpha-3 country code. Use lookup_country to find codes.
-        variable: Climate variable ID (e.g. 'tasAdjust', 'prAdjust'). Use list_climate_variables to get exact IDs — do NOT guess.
-        scenario: Emission scenario ID. Default: 'h_cpol' (current policies). Use list_scenarios to see options.
+        country_iso: ISO 3166-1 alpha-3 country code. See climate://countries resource for all valid codes.
+        variable: Climate variable ID (e.g. 'tasAdjust', 'prAdjust'). See climate://variables resource for all valid IDs — do NOT guess.
+        scenario: Emission scenario ID. Default: 'h_cpol' (current policies). See climate://scenarios resource for all valid IDs.
         season: Season. Default: 'annual'.
         spatial_weighting: Spatial aggregation method. Default: 'area'.
     """
