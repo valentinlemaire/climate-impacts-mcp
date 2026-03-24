@@ -44,9 +44,11 @@ class CIEClient:
         scenario: str,
         season: str = "annual",
         aggregation_spatial: str = "area",
+        region: str | None = None,
     ) -> TimeseriesResponse:
         params = {
             "iso": iso,
+            "region": region or iso,
             "var": var,
             "scenario": scenario,
             "season": season,

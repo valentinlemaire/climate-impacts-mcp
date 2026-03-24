@@ -59,7 +59,8 @@ Returns projected timeseries data for a country, variable, scenario, season, and
 | Parameter              | Type   | Required | Description                      |
 |------------------------|--------|----------|----------------------------------|
 | `iso`                  | string | Yes      | Country/group ISO code (e.g. `DEU`) |
-| `var`                  | string | Yes      | Variable short name (e.g. `tas`) |
+| `region`               | string | Yes      | Region code — same as `iso` for country-level queries, or a subregion ID |
+| `var`                  | string | Yes      | Variable ID (e.g. `tasAdjust`)   |
 | `scenario`             | string | Yes      | Scenario ID                      |
 | `season`               | string | No       | Season (default: `annual`)       |
 | `aggregation_spatial`  | string | No       | Spatial aggregation (default: `area`) |
@@ -197,14 +198,14 @@ Returns TopoJSON country boundary with subregion name lookup.
 
 | Group                  | Example Variables                           |
 |------------------------|---------------------------------------------|
-| Climate                | `tas`, `pr`, `sst`                          |
-| Drought                | `drought_*`                                 |
-| Heat                   | `heatwave_*`, `hot_days_*`                  |
-| Extreme Precipitation  | `precip_extreme_*`                          |
-| Fire                   | `fire_*`, `burnt_area_*`                    |
-| Freshwater             | `water_*`, `runoff_*`                       |
-| Agriculture            | `crop_yield_*`                              |
-| Labour Productivity    | `labour_*`                                  |
+| Climate                | `tasAdjust`, `prAdjust`, `tasmaxAdjust`     |
+| Drought                | `consecutive_dry_days`, `drought_intensity`, `spei_gamma_12` |
+| Heat                   | `TXx`, `wet_bulb_temperature`, `HI-danger`  |
+| Extreme Precipitation  | `rx1day`, `rx5day`, `heavy_precipitation_days` |
+| Fire                   | `fwils`, `fwixd`                            |
+| Freshwater             | `dis`, `qs`, `wsi`                          |
+| Agriculture            | `maize_yield`, `wheat_yield`, `rice_yield`  |
+| Labour Productivity    | `labour-productivity-loss`                  |
 
 (Exact variable list is dynamic; use `/api/meta/` to get current variables.)
 
@@ -232,7 +233,7 @@ The `message` field often contains HTML — strip tags before displaying.
 
 ## Known Quirks
 
-- The `var` parameter caused errors in some v2 timeseries calls for certain variables
+- The `/api/timeseries/` endpoint requires a `region` parameter — without it, most countries return an error. For country-level queries, set `region` to the same value as `iso`.
 - Some country + scenario combinations return no data (empty arrays)
 - `warming_levels` array contains `null` values for low-emission scenarios at later years where those warming levels are never reached
 - Data is in 5-year intervals: 2015, 2020, 2025, ..., 2095, 2100 (18 points)

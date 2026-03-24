@@ -18,13 +18,13 @@ from .validation import (
 KEY_VARIABLES: list[str] = [
     "tasAdjust",
     "prAdjust",
-    "dryDaysAdjust",
-    "heatwave_days_tasmax_q98",
-    "rx1day_precip_Adjust",
-    "burntFractionAll",
-    "dischargeAdjust",
-    "yield_mai_noirr",
-    "labourprod_impact_high",
+    "consecutive_dry_days",
+    "TXx",
+    "rx1day",
+    "fwils",
+    "dis",
+    "maize_yield",
+    "labour-productivity-loss",
 ]
 
 SCENARIOS = ["h_cpol", "o_1p5c"]
