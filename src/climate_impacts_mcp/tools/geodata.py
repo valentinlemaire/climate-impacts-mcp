@@ -43,6 +43,8 @@ async def get_spatial_data(
     TopoJSON border. You MUST use it as a clip path — do NOT fetch country borders from
     any external URL. Each grid cell is a 0.5deg x 0.5deg rectangle. Clip all grid cells
     to the `boundary` outline (D3: clipPath + topojson.feature) before rendering.
+    NEVER filter, crop, or omit grid cells — render ALL cells including zeros and low
+    values. Use a continuous color scale so zeros appear as the lightest shade, not gaps.
 
     Args:
         country_iso: ISO 3166-1 alpha-3 country code. See climate://countries resource for all valid codes.

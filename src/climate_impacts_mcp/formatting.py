@@ -196,7 +196,10 @@ def format_spatial_data(
         "- Do NOT fetch country borders from any external URL — the border is already in `boundary`.\n"
         "- Each grid cell is a 0.5° × 0.5° rectangle centered on [lat, lon].\n"
         "- D3 pattern: define a `<clipPath>` from `topojson.feature(boundary, ...)`, "
-        "apply it to the grid layer, then draw the boundary stroke on top."
+        "apply it to the grid layer, then draw the boundary stroke on top.\n"
+        "- NEVER filter, crop, or omit grid cells — render ALL cells in the data, "
+        "including zeros and low values. Use a continuous color scale so zeros appear "
+        "as the lightest shade, not as gaps."
     )
     lines.append("")
     lines.append("```json")

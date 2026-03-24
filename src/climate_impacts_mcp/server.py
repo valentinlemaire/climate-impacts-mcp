@@ -39,7 +39,8 @@ INSTRUCTIONS = (
     "For maps: call `get_spatial_data` — the response already includes the country's "
     "TopoJSON border in the `boundary` field. ALWAYS use this `boundary` as a clip path "
     "so grid cells are cropped to the country outline. Never fetch country borders from "
-    "an external URL — the border is already in the response.\n\n"
+    "an external URL — the border is already in the response. "
+    "NEVER filter or omit grid cells — always render ALL cells including zeros.\n\n"
     "Do NOT guess variable IDs — they are specific (e.g. 'tasAdjust' not 'tas'). "
     "If you use a wrong ID, the tool will suggest valid options."
 )
