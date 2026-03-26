@@ -10,6 +10,7 @@ from mcp.server.fastmcp import Context, FastMCP
 
 from .client import CIEClient
 from .formatting import format_country_list, format_scenario_list, format_variable_list
+from .logging import log_tool_call, setup_logging
 from .tools.geodata import get_spatial_data
 from .tools.metadata import list_climate_variables, list_scenarios, lookup_country
 from .tools.overview import get_country_overview
@@ -91,18 +92,19 @@ def _create_server(host: str = "127.0.0.1", port: int = 8000) -> FastMCP:
     server.resource("climate://variables", description="All valid climate variable IDs, names, units, and groups")(_variables_resource)
     server.resource("climate://scenarios", description="All valid emission scenario IDs and descriptions")(_scenarios_resource)
     server.resource("climate://countries", description="All supported country names and ISO 3166-1 alpha-3 codes")(_countries_resource)
-    server.tool()(get_country_overview)
-    server.tool()(lookup_country)
-    server.tool()(list_climate_variables)
-    server.tool()(list_scenarios)
-    server.tool()(get_climate_projections)
-    server.tool()(compare_scenarios)
-    server.tool()(get_warming_level_snapshot)
-    server.tool()(get_spatial_data)
+    server.tool()(log_tool_call(get_country_overview))
+    server.tool()(log_tool_call(lookup_country))
+    server.tool()(log_tool_call(list_climate_variables))
+    server.tool()(log_tool_call(list_scenarios))
+    server.tool()(log_tool_call(get_climate_projections))
+    server.tool()(log_tool_call(compare_scenarios))
+    server.tool()(log_tool_call(get_warming_level_snapshot))
+    server.tool()(log_tool_call(get_spatial_data))
     return server
 
 
 def main():
+    setup_logging()
     port = int(os.environ.get("PORT", "0"))
     if port:
         server = _create_server(host="0.0.0.0", port=port)
